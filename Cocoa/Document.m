@@ -817,12 +817,14 @@ static unsigned *multiplication_table_for_frequency(unsigned frequency)
 
 - (void)batteryTimerExpired
 {
-    if (_dirtyBattery && !GB_get_battery_dirty(&_gb)) {
-        GB_save_battery(&_gb, self.savPath.UTF8String);
-    }
-    
-    _dirtyBattery = GB_get_battery_dirty(&_gb);
-    GB_clear_battery_dirty(&_gb);
+    [self performAtomicBlock:^{
+        if (_dirtyBattery && !GB_get_battery_dirty(&_gb)) {
+            GB_save_battery(&_gb, self.savPath.UTF8String);
+        }
+        
+        _dirtyBattery = GB_get_battery_dirty(&_gb);
+        GB_clear_battery_dirty(&_gb);
+    }];
 }
 
 - (NSFont *)debuggerFontOfSize:(unsigned)size
